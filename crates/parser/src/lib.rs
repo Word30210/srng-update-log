@@ -38,7 +38,7 @@ impl Item {
         }
         
         out.push_str(format!(
-            r#"    {{ type = "{}", text = "{}" }}"#,
+            r#"    {{ type = "{}", text = "{}" }},"#,
             self.item_type,
             escape_luau_string(&self.text)
         ).as_str());
