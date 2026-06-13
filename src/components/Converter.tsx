@@ -2,7 +2,7 @@ import { createSignal, createEffect, onMount, onCleanup } from 'solid-js';
 import init, { convert } from '../../crates/parser/pkg/parser';
 
 import { EditorState } from '@codemirror/state';
-import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
+import { EditorView, keymap, highlightActiveLine } from '@codemirror/view';
 import { markdown } from '@codemirror/lang-markdown';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
@@ -59,8 +59,9 @@ export default function Converter() {
                     }),
                     EditorView.theme({
                         '&': { height: '100%', 'font-size': '14px' },
-                        '.cm-scroller': { 'font-family': 'monospace', 'scrollbar-width': 'none', },
+                        '.cm-scroller': { 'font-family': 'var(--code-font)', 'scrollbar-width': 'none', },
                         '.cm-scroller::-webkit-scrollbar': { display: 'none' },
+                        '.cm-content': { padding: '0.75rem 0' },
                     }),
                 ],
             });
@@ -88,45 +89,34 @@ export default function Converter() {
     };
 
     return (
-        <div style={{ display: 'flex', gap: '1rem', height: '70vh' }}>
-            <div style={{ flex: 1, 'min-width': 0, display: 'flex', 'flex-direction': 'column' }}>
-                <h2>Markdown 입력</h2>
-                <div
-                    ref={ editorContainer }
-                    style={{
-                        flex: 1,
-                        border: '1px solid #777',
-                        'border-radius': '4px',
-                        overflow: 'hidden',
-                    }}
-                />
-            </div>
+        <div class="io-grid">
+            <section class="panel panel--in">
+                <div class="panel-header">
+                    <span class="arw">◀</span>
+                    <span class="ph-label">Markdown 입력</span>
+                    <span class="arw">▶</span>
+                </div>
+                <div class="panel-body">
+                    <div ref={ editorContainer } class="cm-host" />
+                </div>
+            </section>
 
-            <div style={{ flex:1, display: 'flex', 'min-width': 0, 'flex-direction': 'column' }}>
-                <h2>Luau 출력</h2>
-                <pre
-                    style={{
-                        flex: 1,
-                        margin: 0,
-                        padding: '0.5rem',
-                        border: '1px solid #777',
-                        'border-radius': '4px',
-                        'background-color': '#2d2d2d',
-                        color: '#ccc',
-                        'font-family': 'monospace',
-                        'font-size': '14px',
-                        overflow: 'auto',
-                        'scrollbar-width': 'none',
-                        'white-space': 'pre-wrap',
-                    }}
-                >
-                    {isReady()? (
-                        <code class="language-lua" innerHTML={ highlightedLuau() }/>
+            <section class="panel panel--out">
+                <div class="panel-header">
+                    <span class="arw">◀</span>
+                    <span class="ph-label">Luau 출력</span>
+                    <span class="arw">▶</span>
+                </div>
+                <div class="panel-body">
+                    {isReady() ? (
+                        <pre class="luau-output">
+                            <code class="language-lua" innerHTML={ highlightedLuau() } />
+                        </pre>
                     ) : (
-                        'Loading WASM...'
+                        <div class="luau-loading">Loading WASM...</div>
                     )}
-                </pre>
-            </div>
+                </div>
+            </section>
         </div>
     );
 }
